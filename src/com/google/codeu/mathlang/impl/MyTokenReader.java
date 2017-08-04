@@ -27,20 +27,76 @@ import com.google.codeu.mathlang.parsing.TokenReader;
 // work with the test of the system.
 public final class MyTokenReader implements TokenReader {
 
+  private int index;
+  private String stream;
+
   public MyTokenReader(String source) {
-    // Your token reader will only be given a string for input. The string will
-    // contain the whole source (0 or more lines).
+    this.index = 0;
+    this.stream = source;
   }
 
   @Override
   public Token next() throws IOException {
-    // Most of your work will take place here. For every call to |next| you should
-    // return a token until you reach the end. When there are no more tokens, you
-    // should return |null| to signal the end of input.
 
-    // If for any reason you detect an error in the input, you may throw an IOException
-    // which will stop all execution.
+    if (index >= stream.length()) {
+      return null;
+    }
+    else {
+      String tempString = stream.substring(index);
+      char firstCharacter = tempString.charAt(0);
+
+      // Tokenizing symbol characters
+      if (firstCharacter == '+' || firstCharacter == '-' || firstCharacter == '/' || firstCharacter == '=') {
+        this.index++;
+        return new SymbolToken(firstCharacter);
+      }
+
+      //Tokenizing numbers
+      else if (isNumber(firstCharacter)) {
+        String number = Character.toString(firstCharacter);
+        int i = 1;
+        while ((i < tempString.length()) && (isNumber(tempString.charAt(i)) || tempString.charAt(i) == '.')) {
+          number += tempString.charAt(i);
+        }
+        double doubleNum = Double.parseDouble(number);
+        this.index++;
+        return new NumberToken(doubleNum);
+      }
+
+      //Tokenizing commments (aka strings) 
+      else if (firstCharacter == '\"') {
+        int endIndex = tempString.indexOf('\"', 1);
+        if (endIndex > 0) {
+          this.index = endIndex + 1;
+          return new StringToken(tempString.substring(1, endIndex));
+        }
+        else {
+          throw new IOException("Need to close string for valid tokenized input");
+        }
+      }
+
+      //Tokenizing names
+      else {
+        String name = Character.toString(firstCharacter);
+        for (int i = 1; Character.isAlphabetic(tempString.charAt(i)); i++) {
+          name += tempString.charAt(i);
+          index++;
+        }
+        return new NameToken(name);
+      }
+    }
 
     return null;
   }
+
+  public boolean isNumber(char c) {
+    try {
+      Integer.parseInt(Character.toString(c));
+      return true;
+    }
+    catch (Exception e) {
+      return false;
+    }
+  }
+
 }
