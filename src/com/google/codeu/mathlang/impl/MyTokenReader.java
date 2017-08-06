@@ -17,6 +17,10 @@ package com.google.codeu.mathlang.impl;
 import java.io.IOException;
 
 import com.google.codeu.mathlang.core.tokens.Token;
+import com.google.codeu.mathlang.core.tokens.NameToken;
+import com.google.codeu.mathlang.core.tokens.StringToken;
+import com.google.codeu.mathlang.core.tokens.NumberToken;
+import com.google.codeu.mathlang.core.tokens.SymbolToken;
 import com.google.codeu.mathlang.parsing.TokenReader;
 
 // MY TOKEN READER
@@ -46,16 +50,16 @@ public final class MyTokenReader implements TokenReader {
       char firstCharacter = tempString.charAt(0);
 
       // Tokenizing symbol characters
-      if (firstCharacter == '+' || firstCharacter == '-' || firstCharacter == '/' || firstCharacter == '=') {
+      if (firstCharacter == '+' || firstCharacter == '-' || firstCharacter == '/' || firstCharacter == '=' || firstCharacter == ';') {
         this.index++;
         return new SymbolToken(firstCharacter);
       }
 
       //Tokenizing numbers
-      else if (isNumber(firstCharacter)) {
+      else if (Character.isDigit(firstCharacter)) {
         String number = Character.toString(firstCharacter);
         int i = 1;
-        while ((i < tempString.length()) && (isNumber(tempString.charAt(i)) || tempString.charAt(i) == '.')) {
+        while ((i < tempString.length()) && (Character.isDigit(tempString.charAt(i)) || tempString.charAt(i) == '.')) {
           number += tempString.charAt(i);
         }
         double doubleNum = Double.parseDouble(number);
@@ -84,18 +88,6 @@ public final class MyTokenReader implements TokenReader {
         }
         return new NameToken(name);
       }
-    }
-
-    return null;
-  }
-
-  public boolean isNumber(char c) {
-    try {
-      Integer.parseInt(Character.toString(c));
-      return true;
-    }
-    catch (Exception e) {
-      return false;
     }
   }
 
